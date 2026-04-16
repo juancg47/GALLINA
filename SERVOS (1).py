@@ -445,6 +445,12 @@ class MainWindow(QtWidgets.QDialog):
 
         self.ui.horizontalSlider.setRange(0, 180)
         self.ui.horizontalSlider_2.setRange(0, 180)
+        self.ui.horizontalSlider.setEnabled(False)
+        self.ui.horizontalSlider_2.setEnabled(False)
+
+        # Inicializar etiquetas de ángulo (Static Text)
+        self.ui.label_5.setText("0°")
+        self.ui.label_6.setText("0°")
 
         # Inicializar pigpio
         if GPIO_AVAILABLE:
@@ -458,14 +464,25 @@ class MainWindow(QtWidgets.QDialog):
         # Conexiones
         self.ui.horizontalSlider.valueChanged.connect(self._actualizar_servo1)
         self.ui.horizontalSlider_2.valueChanged.connect(self._actualizar_servo2)
-        self.ui.pushButton.clicked.connect(self._click_ok)
+        self.ui.pushButton.clicked.connect(self._confirmar_seleccion)
 
-    def _click_ok(self):
-        txt = self.ui.lineEdit.text()
-        if txt in ["1", "2"]:
-            QtWidgets.QMessageBox.information(self, "Selección", f"Servo {txt} listo para control.")
+    def _confirmar_seleccion(self):
+        """Valida el Edit Text y habilita/deshabilita los sliders según la opción."""
+        seleccion = self.ui.lineEdit.text().strip()
+
+        if seleccion == "1":
+            self.ui.horizontalSlider.setEnabled(True)
+            self.ui.horizontalSlider_2.setEnabled(False)
+            QtWidgets.QMessageBox.information(self, "Éxito", "Control de Servo 1 habilitado.")
+        elif seleccion == "2":
+            self.ui.horizontalSlider.setEnabled(False)
+            self.ui.horizontalSlider_2.setEnabled(True)
+            QtWidgets.QMessageBox.information(self, "Éxito", "Control de Servo 2 habilitado.")
         else:
-            QtWidgets.QMessageBox.warning(self, "Error", "Por favor ingresa 1 o 2.")
+            # Si el texto no es válido, bloqueamos ambos por seguridad
+            self.ui.horizontalSlider.setEnabled(False)
+            self.ui.horizontalSlider_2.setEnabled(False)
+            QtWidgets.QMessageBox.warning(self, "Error", "Ingrese '1' o '2' para habilitar un slider.")
 
     def _actualizar_servo1(self, v):
         self.ui.label_5.setText(f"{v}°")
