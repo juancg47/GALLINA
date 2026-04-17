@@ -445,6 +445,10 @@ class MainWindow(QtWidgets.QDialog):
 
         self.ui.horizontalSlider.setRange(0, 180)
         self.ui.horizontalSlider_2.setRange(0, 180)
+
+        # Ocultamos o desactivamos el botón ya que no se usará
+        self.ui.pushButton.hide()
+
         self.ui.horizontalSlider.setEnabled(False)
         self.ui.horizontalSlider_2.setEnabled(False)
 
@@ -462,27 +466,26 @@ class MainWindow(QtWidgets.QDialog):
             self.pi = None
 
         # Conexiones
+        # Detecta cambios en el texto automáticamente
+        self.ui.lineEdit.textChanged.connect(self._gestionar_seleccion)
         self.ui.horizontalSlider.valueChanged.connect(self._actualizar_servo1)
         self.ui.horizontalSlider_2.valueChanged.connect(self._actualizar_servo2)
-        self.ui.pushButton.clicked.connect(self._confirmar_seleccion)
+        #self.ui.pushButton.clicked.connect(self._confirmar_seleccion)
 
-    def _confirmar_seleccion(self):
-        """Valida el Edit Text y habilita/deshabilita los sliders según la opción."""
+    def _gestionar_seleccion(self):
+        """Habilita el slider correspondiente según el texto ingresado."""
         seleccion = self.ui.lineEdit.text().strip()
 
         if seleccion == "1":
             self.ui.horizontalSlider.setEnabled(True)
             self.ui.horizontalSlider_2.setEnabled(False)
-            QtWidgets.QMessageBox.information(self, "Éxito", "Control de Servo 1 habilitado.")
         elif seleccion == "2":
             self.ui.horizontalSlider.setEnabled(False)
             self.ui.horizontalSlider_2.setEnabled(True)
-            QtWidgets.QMessageBox.information(self, "Éxito", "Control de Servo 2 habilitado.")
         else:
-            # Si el texto no es válido, bloqueamos ambos por seguridad
+            # Si el texto es borrado o es inválido, se bloquean ambos
             self.ui.horizontalSlider.setEnabled(False)
             self.ui.horizontalSlider_2.setEnabled(False)
-            QtWidgets.QMessageBox.warning(self, "Error", "Ingrese '1' o '2' para habilitar un slider.")
 
     def _actualizar_servo1(self, v):
         self.ui.label_5.setText(f"{v}°")
